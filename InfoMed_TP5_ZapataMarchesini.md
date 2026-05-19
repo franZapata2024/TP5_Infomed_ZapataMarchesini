@@ -6,9 +6,83 @@
 
 ## Parte 1 - Modelo de datos
 
+## 1. Tipo de Base de Datos
+
+Se trata de una **base de datos relacional**, ya que la información se organiza en tablas relacionadas entre sí mediante claves primarias y foráneas.
+
+Según su propósito, es una base de datos **transaccional (OLTP)**, ya que está orientada a registrar operaciones del día a día del sistema de salud (consultas, recetas, pacientes, médicos).
+
+
 ### Diagrama Entidad-Relación
 
 (ACA PEGÁS LA IMAGEN)
+
+## 4. Normalización
+
+### Caso 1
+
+**Problema:**  
+El atributo *Teléfonos* contiene múltiples valores en una misma celda.
+
+**Forma normal violada:**  
+Primera Forma Normal (1FN)
+
+**Solución:**  
+Crear una tabla separada:
+
+- Telefonos(id_telefono, id_paciente, telefono)
+
+---
+
+### Caso 2
+
+**Problema:**  
+Existe dependencia entre *Ciudad* y *Código Postal*.
+
+**Forma normal violada:**  
+Tercera Forma Normal (3FN)
+
+**Solución:**  
+Separar en otra tabla:
+
+- Ciudades(id_ciudad, nombre, codigo_postal)
+
+---
+
+### Caso 3
+
+**Problema:**  
+Se repiten datos como nombre del paciente y especialidad del médico.
+
+**Forma normal violada:**  
+Segunda Forma Normal (2FN)
+
+**Solución:**  
+Separar entidades:
+
+- Pacientes
+- Medicos
+- Especialidades
+
+y usar claves foráneas.
+
+---
+
+### Caso 4
+
+**Problema:**  
+Existe redundancia entre enfermedad y medicamento.
+
+**Forma normal violada:**  
+Tercera Forma Normal (3FN)
+
+**Solución:**  
+Separar en tablas:
+
+- Enfermedades
+- Medicamentos
+- Recetas (relación entre ellas)
+
 
 ## Parte 2 - Consultas SQL
 
