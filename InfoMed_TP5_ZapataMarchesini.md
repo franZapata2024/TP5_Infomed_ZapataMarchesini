@@ -129,7 +129,7 @@ Las **claves primarias (PK)** identifican de manera única cada registro, mientr
 
 ### Diagrama Crow’s Foot
 
-
+<img width="353" height="515" alt="image" src="https://github.com/user-attachments/assets/4dfefbac-6ec0-41a9-ba3a-ad2931b834b6" />
 
 
 ## 4. Normalización
