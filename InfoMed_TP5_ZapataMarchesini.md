@@ -1,4 +1,4 @@
-<img width="207" height="224" alt="image" src="https://github.com/user-attachments/assets/8e85f71a-22bd-4ec1-a3fb-1e08df4ecd02" /><img width="571" height="197" alt="image" src="https://github.com/user-attachments/assets/a6bc99be-3fb5-4874-aaaf-243185db28b6" /># TP5 - Base de Datos
+ TP5 - Base de Datos
 
 ## Integrantes
 - Franco Zapata
@@ -25,7 +25,7 @@
 
 ## Consigna 2
 
-``sql
+```sql
 CREATE VIEW VistaPacientesEdad AS
 SELECT
     id_paciente,
