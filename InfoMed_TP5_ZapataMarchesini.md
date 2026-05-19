@@ -14,7 +14,7 @@
 
 ## Consigna 1
   
-  ``sql
+  ```sql
   CREATE INDEX idx_pacientes_ciudad
   ON Pacientes(ciudad);
   
@@ -47,7 +47,7 @@ Se crea una vista que calcula la edad de cada paciente dinámicamente.
 
 ## Consigna 3
 
-``sql
+```sql
 SELECT nombre, edad
 FROM VistaPacientesEdad
 WHERE edad < 18;
@@ -59,7 +59,7 @@ La condición WHERE edad < 18 filtra únicamente a los menores.
 
 ## Consigna 4
 
-``sql
+```sql
 UPDATE Pacientes
 SET calle = 'Calle Corrientes',
     numero = '500',
