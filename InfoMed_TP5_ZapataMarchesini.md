@@ -8,27 +8,142 @@
 
 ## 1. Tipo de Base de Datos
 
+
 Se trata de una **base de datos relacional**, ya que la información se organiza en tablas relacionadas entre sí mediante claves primarias y foráneas.
 
 Según su propósito, es una base de datos **transaccional (OLTP)**, ya que está orientada a registrar operaciones del día a día del sistema de salud (consultas, recetas, pacientes, médicos).
 
 
-### Diagrama Entidad-Relación
+## 2. Modelo Conceptual (Decisiones de Diseño)
 
-(ACA PEGÁS LA IMAGEN)
+
+### Análisis del enunciado
+
+El modelo surge del análisis del sistema descripto: un centro de salud donde los pacientes son atendidos por médicos en consultas, y como resultado pueden generarse recetas con tratamientos asociados a enfermedades.
+
+### Decisiones de diseño fundamentadas
+
+- Se separó **CONSULTA** como entidad propia porque representa un evento con fecha y participantes específicos (paciente y médico), siendo el punto central del sistema.
+
+- **RECETA** se modeló como entidad independiente vinculada a una consulta, ya que no toda consulta genera una receta (participación opcional, cardinalidad 0..1).
+
+- Se creó la tabla intermedia **RECETA_TRATAMIENTO** para resolver la relación muchos a muchos entre recetas y tratamientos, evitando redundancia.
+
+
+### Normalización aplicada
+
+- Se evitaron atributos multivaluados (por ejemplo, teléfonos o tratamientos dentro de la receta).
+
+- Cada entidad depende únicamente de su clave primaria, cumpliendo con **Segunda y Tercera Forma Normal (2FN y 3FN)**.
+
+
+### Tablas de referencia incorporadas
+
+- **ESPECIALIDAD**: evita repetir el nombre de la especialidad en cada registro de médico.
+
+- **ENFERMEDAD**: centraliza los diagnósticos, permitiendo análisis estadísticos y seguimiento epidemiológico.
+
+- **TRATAMIENTO**: permite reutilizar tratamientos en distintas recetas sin duplicar información.
+
+
+### Problemas evitados
+
+- **Redundancia**: los datos de especialidad, enfermedad y tratamiento se almacenan una sola vez y se referencian mediante claves foráneas.
+
+- **Inconsistencias**: al centralizar estos datos, un cambio en el nombre de una especialidad o enfermedad se actualiza en un solo lugar.
+
+- **Dificultades de mantenimiento**: el modelo permite agregar nuevos médicos, especialidades o tratamientos sin modificar la estructura de otras tablas.
+
+<img width="782" height="512" alt="image" src="https://github.com/user-attachments/assets/f7513062-697d-442a-b97c-d3ded1fe26db" />
+
+
+## 3. Modelo Relacional — Notación Crow’s Foot
+
+
+El siguiente modelo representa la transformación del modelo conceptual a un modelo relacional.
+
+Se utilizó notación **Crow’s Foot**, indicando la cardinalidad mínima y máxima en cada extremo de las relaciones.
+
+Las **claves primarias (PK)** identifican de manera única cada registro, mientras que las **claves foráneas (FK)** establecen las relaciones entre tablas.
+
+### Tablas del modelo
+
+- **PACIENTE**
+  - paciente_id (PK)
+  - nombre
+  - fecha_nacim
+  - sexo
+  - calle
+  - numero
+  - ciudad
+
+- **MEDICO**
+  - medico_id (PK)
+  - nombre
+  - dir_profesional
+  - espec_id (FK)
+
+- **ESPECIALIDAD**
+  - espec_id (PK)
+  - nombre_espec
+  - descripcion
+
+- **CONSULTA**
+  - consulta_id (PK)
+  - fecha
+  - paciente_id (FK)
+  - medico_id (FK)
+
+- **RECETA**
+  - receta_id (PK)
+  - fecha
+  - indicaciones
+  - consulta_id (FK)
+  - enfermedad_id (FK)
+
+- **ENFERMEDAD**
+  - enfermedad_id (PK)
+  - nombre_enfermedad
+  - descripcion
+
+- **TRATAMIENTO**
+  - tratamiento_id (PK)
+  - nombre_tratamiento
+  - tipo_tratamiento
+
+- **RECETA_TRATAMIENTO**
+  - receta_id (FK)
+  - tratamiento_id (FK)
+
+---
+
+### Relaciones principales
+
+- Un **PACIENTE** puede tener muchas **CONSULTAS** (1:N)
+- Un **MEDICO** puede realizar muchas **CONSULTAS** (1:N)
+- Una **CONSULTA** puede generar una **RECETA** (1:0..1)
+- Una **RECETA** puede tener varios **TRATAMIENTOS** (N:M, resuelto con RECETA_TRATAMIENTO)
+- Un **MEDICO** pertenece a una **ESPECIALIDAD** (N:1)
+
+---
+
+### Diagrama Crow’s Foot
+
+
+
 
 ## 4. Normalización
 
 ### Caso 1
 
 **Problema:**  
-El atributo *Teléfonos* contiene múltiples valores en una misma celda.
+El atributo *Teléfonos* contiene múltiples valores en una misma celda (por ejemplo: 1111, 2222).
 
 **Forma normal violada:**  
-Primera Forma Normal (1FN)
+Primera Forma Normal (1FN), ya que los atributos deben ser atómicos (un solo valor por celda).
 
 **Solución:**  
-Crear una tabla separada:
+Separar los teléfonos en una tabla independiente:
 
 - Telefonos(id_telefono, id_paciente, telefono)
 
@@ -37,13 +152,13 @@ Crear una tabla separada:
 ### Caso 2
 
 **Problema:**  
-Existe dependencia entre *Ciudad* y *Código Postal*.
+Existe dependencia entre los atributos *Ciudad* y *Código Postal*.
 
 **Forma normal violada:**  
-Tercera Forma Normal (3FN)
+Tercera Forma Normal (3FN), ya que hay una dependencia transitiva.
 
 **Solución:**  
-Separar en otra tabla:
+Crear una tabla independiente:
 
 - Ciudades(id_ciudad, nombre, codigo_postal)
 
@@ -52,17 +167,16 @@ Separar en otra tabla:
 ### Caso 3
 
 **Problema:**  
-Se repiten datos como nombre del paciente y especialidad del médico.
+Se almacenan datos redundantes como *NombrePaciente* y *Especialidad* en una tabla que tiene clave compuesta (PacienteID, MedicoID).
 
 **Forma normal violada:**  
-Segunda Forma Normal (2FN)
+Segunda Forma Normal (2FN), ya que hay dependencias parciales de la clave primaria.
 
 **Solución:**  
-Separar entidades:
+Separar en tablas:
 
-- Pacientes
-- Medicos
-- Especialidades
+- Pacientes(id_paciente, nombre)
+- Medicos(id_medico, especialidad)
 
 y usar claves foráneas.
 
@@ -71,18 +185,17 @@ y usar claves foráneas.
 ### Caso 4
 
 **Problema:**  
-Existe redundancia entre enfermedad y medicamento.
+Existe redundancia entre *Enfermedad* y *Medicamento*, generando múltiples combinaciones repetidas.
 
 **Forma normal violada:**  
-Tercera Forma Normal (3FN)
+Tercera Forma Normal (3FN).
 
 **Solución:**  
 Separar en tablas:
 
-- Enfermedades
-- Medicamentos
-- Recetas (relación entre ellas)
-
+- Enfermedades(id_enfermedad, nombre)
+- Medicamentos(id_medicamento, nombre)
+- Recetas (relaciona paciente, médico, enfermedad y medicamento)
 
 ## Parte 2 - Consultas SQL
 
